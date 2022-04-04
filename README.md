@@ -1,2 +1,2 @@
-# dss-1
-distributed storage systems first lab
+# postgres-system-catalogs
+![Image alt](вариант.png)
