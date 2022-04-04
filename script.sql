@@ -18,11 +18,11 @@ $$
                       and pg_indexes.indexdef ~* (pa.attname)
                    )                                        as index,
                    (select string_agg(distinct pc.conname, ',')
-                    from pg_class as con_pg_class
-                             join pg_attribute con_pa on con_pg_class.oid = con_pa.attrelid
-                             left join pg_constraint pc on con_pa.attrelid = pc.conrelid
-                    where con_pa.attname = pa.attname
-                      and con_pg_class.relname = pg_class.relname
+                    from pg_class as constraints_pg_class
+                             join pg_attribute constraints_pa on constraints_pg_class.oid = constraints_pa.attrelid
+                             left join pg_constraint pc on constraints_pa.attrelid = pc.conrelid
+                    where constraints_pa.attname = pa.attname
+                      and constraints_pg_class.relname = pg_class.relname
                       and pc.conname ~* (pa.attname)
                    )                                        as constr
             from pg_class
@@ -34,12 +34,6 @@ $$
               and pg_class.reltype != 0
         );
     begin
-        if schemaName IS NULL or schemaName = '' then
-            raise exception 'Schema not found!';
-        end if;
-        if columnName IS NULL or columnName = '' then
-            raise exception 'Column not found!';
-        end if;
         select count(*)
         into counter
         from pg_class
@@ -73,7 +67,7 @@ $$
                         raise info '%', result;
                     end if;
                     if currentColumn.index IS NOT NULL then
-                        select format('%-5s %-20s %-25s %-15s %s', '.', ' ', ' ', 'Index', currentColumn.index)
+                        select format('%-5s %-20s %-25s %-15s', '.', ' ', ' ', 'Index', currentColumn.index)
                         into result;
                         raise info '%', result;
                     end if;
